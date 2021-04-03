@@ -14,9 +14,11 @@ def online_lookup(isin):
         headers.update({'X-OPENFIGI-APIKEY': args.apiKey})
     else:
         sleepTime = 12
-        logger.info("Wait for {}s to stay under the rate limit".format(sleepTime))
-        sleep(sleepTime) # to stay under the rate limit of 5 per Min
+        logger.info(
+            "Wait for {}s to stay under the rate limit".format(sleepTime))
+        sleep(sleepTime)  # to stay under the rate limit of 5 per Min
 
+    # this should work for US stocks, everything else ¯\_(ツ)_/¯
     payload = '[{"idType":"ID_ISIN","idValue":"'+isin+'","exchCode":"US"}]'
     try:
         rsp = requests.post(url, headers=headers, data=payload).json()[0]
@@ -69,7 +71,7 @@ def main(dataFilePath):
     data.columns = newHeader
 
     # convert date
-    logger.info("Convert date")
+    logger.info("Convert dates")
     data["Date"] = pd.to_datetime(data["Date"], format="%d-%m-%Y")
 
     # convert Product to Symbol
@@ -77,7 +79,7 @@ def main(dataFilePath):
     data["Symbol"] = data["Symbol"].apply(lookup_symbol)
 
     outputFile = "output.csv"
-    logger.info("Write to {}".format(outputFile))
+    logger.info("Finished! Write to {}".format(outputFile))
     data.to_csv(outputFile, index=False)
 
 
@@ -102,7 +104,7 @@ if __name__ == "__main__":
     numeric_level = getattr(logging, args.log_level.upper(), None)
 
     logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format='%(asctime)s [%(levelname)s] %(message)s',
         level=numeric_level,
         filename=args.log_file)
 

@@ -17,7 +17,11 @@ def online_lookup(isin):
 
 
 def lookup_symbol(isin):
-    lookup = pd.read_csv("SymbolLookUp.csv")
+    try:
+        lookup = pd.read_csv("SymbolLookUp.csv")
+    except FileNotFoundError:
+        lookup = pd.DataFrame(columns=["ISIN", "Symbol"])
+
     match = (lookup["ISIN"].str.contains(isin))
     symbol = lookup["Symbol"][match]
     if symbol.size == 0:

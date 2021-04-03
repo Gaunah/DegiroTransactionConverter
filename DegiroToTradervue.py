@@ -10,6 +10,13 @@ def online_lookup(isin):
     logger.info("Try to fetch symbol for: {}".format(isin))
     url = 'https://api.openfigi.com/v2/mapping'
     headers = {'Content-Type': 'text/json'}
+    if args.apiKey != None:
+        headers.update({'X-OPENFIGI-APIKEY': args.apiKey})
+    else:
+        sleepTime = 12
+        logger.info("Wait for {}s to stay under the rate limit".format(sleepTime))
+        sleep(sleepTime) # to stay under the rate limit of 5 per Min
+
     payload = '[{"idType":"ID_ISIN","idValue":"'+isin+'","exchCode":"US"}]'
     try:
         rsp = requests.post(url, headers=headers, data=payload).json()[0]
@@ -35,7 +42,6 @@ def lookup_symbol(isin):
         lookup = lookup.append(pd.DataFrame(
             {"ISIN": [isin], "Symbol": [sym]}), ignore_index=True)
         lookup.to_csv("SymbolLookUp.csv", index=False)
-        sleep(12) # to stay under the rate limit of 5 per Min; could be lowerd if api key is added
         return sym
     else:
         return symbol.values[0]
@@ -80,6 +86,9 @@ if __name__ == "__main__":
     parser.add_argument("--data",
                         help="CSV file containing the Degiro transaction data e.g.\"Transactions.csv\"",
                         required=True)
+    parser.add_argument("--apiKey",
+                        help="OpenFIGI api key to increase the rate limit on ISIN to Symbol lookups",
+                        default=None)
     parser.add_argument("--log_level",
                         help="logging level",
                         choices=["DEBUG", "INFO",

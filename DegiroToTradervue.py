@@ -11,8 +11,13 @@ def online_lookup(isin):
     url = 'https://api.openfigi.com/v2/mapping'
     headers = {'Content-Type': 'text/json'}
     payload = '[{"idType":"ID_ISIN","idValue":"'+isin+'","exchCode":"US"}]'
-    rsp = requests.post(url, headers=headers, data=payload).json()[0]
-    sym = rsp["data"][0]["ticker"]
+    try:
+        rsp = requests.post(url, headers=headers, data=payload).json()[0]
+        logger.debug(rsp)
+        sym = rsp["data"][0]["ticker"]
+    except Exception:
+        logger.critical("Fatal error on api call")
+        exit(2)
     return sym
 
 

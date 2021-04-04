@@ -76,7 +76,7 @@ def main(dataFilePath):
     data["Date"] = pd.to_datetime(data["Date"], format="%d-%m-%Y")
 
     # convert Product to Symbol
-    logger.info("Convert product name to stock symbol")
+    logger.info("Try to convert ISIN to stock symbol")
     data["Symbol"] = data["Symbol"].apply(lookup_symbol)
 
     outputFile = "output.csv"
@@ -93,12 +93,12 @@ if __name__ == "__main__":
                         help="OpenFIGI api key to increase the rate limit on ISIN to Symbol lookups",
                         default=None)
     parser.add_argument("--log_level",
-                        help="logging level",
+                        help="Logging level",
                         choices=["DEBUG", "INFO",
                                  "WARNING", "ERROR", "CRITICAL"],
                         default="INFO")
     parser.add_argument("--log_file",
-                        help="file were the log gets written to e.g. \"DegiroTradervue.log\"",
+                        help="File were the log gets written to e.g. \"DegiroTradervue.log\"",
                         default=None)
     args = parser.parse_args()
 

@@ -23,10 +23,14 @@ def online_lookup(isin):
     # this should work for US stocks, everything else ¯\_(ツ)_/¯
     payload = '[{"idType":"ID_ISIN","idValue":"'+isin+'","exchCode":"US"}]'
     try:
-        rsp = requests.post(url, headers=headers, data=payload).json()[0]
-        logger.debug(rsp)
-        sym = rsp["data"][0]["ticker"]
-    except Exception:
+        rsp = requests.post(url, headers=headers, data=payload)
+        if rsp.ok:
+            sym = rsp.json()[0]["data"][0]["ticker"]
+        else:
+            logger.error(rsp.text)
+            exit(1)
+    except Exception as ex:
+        logger.debug(ex)
         logger.critical("Fatal error on api call")
         exit(2)
     return sym

@@ -68,11 +68,11 @@ def main(dataFilePath):
     # delete unneeded columns
     logger.info("Drop unneeded columns")
     data.drop(data.columns[[2, 4, 5, 8, 9, 10, 11, 12,
-              13, 14, 15, 16, 17, 18]], axis=1, inplace=True)
+              13, 15, 16, 17, 18]], axis=1, inplace=True)
 
     # change CVS header to match Tradervue generic import format
     logger.info("Change CVS header to match Tradervue generic import format")
-    newHeader = ["Date", "Time", "Symbol", "Quantity", "Price"]
+    newHeader = ["Date", "Time", "Symbol", "Quantity", "Price", "Commissions"]
     data.columns = newHeader
 
     # convert date
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         level=numeric_level,
         filename=args.log_file)
 
-    if args.log_file: # also print everything that is logged
+    if args.log_file:  # also print everything that is logged
         logging.getLogger().addHandler(logging.StreamHandler())
 
     logger = logging.getLogger("DegiroToTradervueLogger")

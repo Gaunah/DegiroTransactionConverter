@@ -12,6 +12,7 @@ def online_lookup(isin):
     url = 'https://api.openfigi.com/v2/mapping'
     headers = {'Content-Type': 'text/json'}
     if args.apiKey != None:
+        # use api key if one is provided
         headers.update({'X-OPENFIGI-APIKEY': args.apiKey})
     else:
         sleepTime = 12
@@ -37,11 +38,14 @@ def lookup_symbol(isin):
     except FileNotFoundError:
         lookup = pd.DataFrame(columns=["ISIN", "Symbol"])
 
+    # try to find the symbol in the look up file
     match = (lookup["ISIN"].str.contains(isin))
     symbol = lookup["Symbol"][match]
+    # if not found make an api call to openfigi
     if symbol.size == 0:
         sym = online_lookup(isin)
         logger.info("Add to lookUpTable {} {}".format(isin, sym))
+        # write back found symbols for furture use
         lookup = lookup.append(pd.DataFrame(
             {"ISIN": [isin], "Symbol": [sym]}), ignore_index=True)
         lookup.to_csv("SymbolLookUp.csv", index=False)
@@ -79,6 +83,7 @@ def main(dataFilePath):
     logger.info("Try to convert ISIN to stock symbol")
     data["Symbol"] = data["Symbol"].apply(lookup_symbol)
 
+    # Write data to "output.csv"
     outputFile = "output.csv"
     logger.info("Finished! Write to {}".format(outputFile))
     data.to_csv(outputFile, index=False)
@@ -98,7 +103,7 @@ if __name__ == "__main__":
                                  "WARNING", "ERROR", "CRITICAL"],
                         default="INFO")
     parser.add_argument("--log_file",
-                        help="File were the log gets written to e.g. \"DegiroTradervue.log\"",
+                        help="File where the log gets written to e.g. \"DegiroTradervue.log\"",
                         default=None)
     args = parser.parse_args()
 
@@ -109,7 +114,7 @@ if __name__ == "__main__":
         level=numeric_level,
         filename=args.log_file)
 
-    if args.log_file:  # to also print everything that is logged if log_file is provided
+    if args.log_file: # also print everything that is logged
         logging.getLogger().addHandler(logging.StreamHandler())
 
     logger = logging.getLogger("DegiroToTradervueLogger")

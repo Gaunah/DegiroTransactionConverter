@@ -50,8 +50,8 @@ def lookup_symbol(isin):
         sym = online_lookup(isin)
         logger.info("Add to lookUpTable {} {}".format(isin, sym))
         # write back found symbols for furture use
-        lookup = lookup.append(pd.DataFrame(
-            {"ISIN": [isin], "Symbol": [sym]}), ignore_index=True)
+        lookup = pd.concat([lookup, pd.DataFrame(
+            {"ISIN": [isin], "Symbol": [sym]})], ignore_index=True)
         lookup.to_csv("SymbolLookUp.csv", index=False)
         return sym
     else:
